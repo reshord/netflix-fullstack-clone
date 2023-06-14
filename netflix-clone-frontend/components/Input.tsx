@@ -1,9 +1,9 @@
-import React from "react"
+import React, { ChangeEvent } from "react"
 
 interface IProps {
     id: string
     onChange: (e: string) => void
-    value: string
+    value: string | undefined
     label: string
     type?: string
 }
@@ -11,24 +11,27 @@ interface IProps {
 const Input: React.FC<IProps> = ({id, onChange, value, label, type}) => {
     return ( 
         <div className="relative">
-            <input 
-            id="email"
-            className="
-                block
-                rounded-md
-                px-6
-                pt-6
-                pb-1
-                w-full
-                text-md
-                text-white
-                bg-neutral-700
-                appearance-none
-                focus:outline-none
-                focus:ring-0
-                peer
-            "
-            placeholder=" "
+            <input
+                value={value}
+                type={type}
+                onChange={(e) => onChange(e.target.value)}
+                id="email"
+                className="
+                    block
+                    rounded-md
+                    px-6
+                    pt-6
+                    pb-1
+                    w-full
+                    text-md
+                    text-white
+                    bg-neutral-700
+                    appearance-none
+                    focus:outline-none
+                    focus:ring-0
+                    peer
+                "
+                placeholder=" "
         />
         <label
          className="
@@ -47,7 +50,7 @@ const Input: React.FC<IProps> = ({id, onChange, value, label, type}) => {
             peer-placeholder-shown:translate-y-0
             peer-focus:scale-75
             peer-focus:-translate-y-3"
-         htmlFor="email">Email</label>
+         htmlFor={id}>{label}</label>
         </div>
      );
 }
