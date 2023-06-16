@@ -1,10 +1,16 @@
 import { useCallback, useState } from "react";
 import Input from "../components/Input";
+import axios from 'axios'
+import {signIn} from 'next-auth/react'
+import { useRouter } from "next/router";
+import {message} from 'antd'
 
 const AuthPage = () => {
 
+    const router = useRouter()
+
     const [email, setEmail] = useState<string>('')
-    const [username, setUsername] = useState<string>('')
+    const [name, setName] = useState<string>('')
     const [password, setPassword] = useState<string>('')
 
     const [variant, setVariant] = useState('login')
@@ -12,6 +18,54 @@ const AuthPage = () => {
     const toggleVariant = useCallback(() => {
         setVariant((currentVariant) => currentVariant === 'login' ? 'register' : 'login')
     }, [])
+
+    // const onSubmit = (data: {username: string, email: string, password: string}) => {
+    //     console.log(data)
+    // }
+
+    const register = useCallback(async () => {
+        try {
+            await axios.post('/api/register', {
+                email,
+                name,
+                password
+            })
+            message.success({
+                duration: 2,
+                content: 'Register Successful'
+            })
+        }
+        catch(e) {
+            console.error(e)
+            message.error({
+                duration: 2,
+                content: 'Something went wrong'
+            })
+        }
+    }, [email, name, password])
+
+    const login = useCallback(async () => {
+        try {
+            await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: '/'
+            })
+            router.push('/')
+            message.success({
+                duration: 2,
+                content: 'Login Successful'
+            })
+        }
+        catch(e) {
+            console.error(e)
+            message.error({
+                duration: 2,
+                content: 'Something went wrong'
+            })
+        }
+    }, [email, password])
 
     return ( 
         <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
@@ -27,9 +81,9 @@ const AuthPage = () => {
                         <div className="flex flex-col gap-4">
                              {variant === 'register' && (
                                 <Input
-                                    label="Username"
-                                    value={username}
-                                    onChange={(e) => setUsername(e)}
+                                    label="name"
+                                    value={name}
+                                    onChange={(e) => setName(e)}
                                     id="name"
                                 />
                              )}
@@ -48,16 +102,14 @@ const AuthPage = () => {
                                 type="password"
                               />
                         </div>
-                        <button className="bg-red-600 py-3 text-white rounded-md w-full mt-10 hover:bg-red-700 font-bold transition">
+                        <button onClick={variant === 'login' ? login : register} className="bg-red-600 py-3 text-white rounded-md w-full mt-10 hover:bg-red-700 font-bold transition">
                             {variant === 'login' ? 'Login' : 'Register'}
                         </button>
                         <p className="text-neutral-500 mt-12">
-                                <div>
-                                    {variant === 'login' ? 'First time using Netflix?' : 'Already have an account?'}
-                                    <span onClick={toggleVariant} className="text-white ml-1 font-bold hover:underline cursor-pointer">
-                                        {variant === 'login' ? 'Create an account' : 'Login'}
-                                    </span>
-                                </div>
+                                {variant === 'login' ? 'First time using Netflix?' : 'Already have an account?'}
+                                <span onClick={toggleVariant} className="text-white ml-1 font-bold hover:underline cursor-pointer">
+                                    {variant === 'login' ? 'Create an account' : 'Login'}
+                                </span>
                         </p>
                     </div>
                 </div>
