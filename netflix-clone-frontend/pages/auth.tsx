@@ -1,17 +1,16 @@
 import { useCallback, useState } from "react";
-import Input from "../../components/Input";
+import Input from "../components/Input";
 import axios from 'axios'
 import {signIn, useSession} from 'next-auth/react'
 import { useRouter } from "next/router";
 import {message} from 'antd'
 import {FcGoogle} from 'react-icons/fc'
 import {FaGithub} from 'react-icons/fa'
+import Head from "next/head";
 
 const AuthPage = () => {
 
-    const {data} = useSession()
     
-    if(data) console.log(data.user)
 
     const router = useRouter()
 
@@ -31,20 +30,11 @@ const AuthPage = () => {
                 email,
                 password,
                 redirect: false,
-                callbackUrl: '/'
-            })
-            router.push('/')
-            message.success({
-                duration: 2,
-                content: 'Login Successful'
+                callbackUrl: '/profiles'
             })
         }
         catch(e) {
             console.error(e)
-            message.error({
-                duration: 2,
-                content: 'Something went wrong'
-            })
         }
     }, [email, password])
 
@@ -56,63 +46,28 @@ const AuthPage = () => {
                 password
             })
             login()
-            message.success({
-                duration: 2,
-                content: 'Register Successful'
-            })
         }
         catch(e) {
             console.error(e)
-            message.error({
-                duration: 2,
-                content: 'Something went wrong'
-            })
         }
     }, [email, name, password])
 
     const signInWithMethods = async (method: string) => {
-        switch(method) {
-            case 'github': 
-                try {
-                    await signIn('github', {callbackUrl: '/'})
-                    message.success({
-                        duration: 2,
-                        content: 'Login with GitHub method successful'
-                    })
-                    router.push('/')
-                }
-                catch(e) {
-                    console.log(e)
-                    message.success({
-                        duration: 2,
-                        content: 'Something went wrong'
-                    })
-                }
-            case 'google':
-                try {
-                    await signIn('google', {callbackUrl: '/'})
-                    message.success({
-                        duration: 2,
-                        content: 'Login with Google method successful'
-                    })
-                    router.push('/')
-                }
-                catch(e) {
-                    console.log(e)
-                    message.success({
-                        duration: 2,
-                        content: 'Something went wrong'
-                    })
-                }
-                
-            default: 
-                break
-        }
+            try {
+                await signIn(`${method}`, {callbackUrl: '/profiles'})
+            }
+            catch(e) {
+                console.log(e)
+            }
     }
     
 
     return ( 
         <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
+            <Head>
+                <title>Auth</title>
+                
+            </Head>
             <div className="bg-black w-full h-full lg:bg-opacity-50">
                 <nav className="px-12 py-5">
                     <img className="h-14" src="/images/logo.png" alt="Netflix" />
