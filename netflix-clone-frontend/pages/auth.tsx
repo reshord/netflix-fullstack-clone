@@ -32,6 +32,7 @@ const AuthPage = () => {
                 redirect: false,
                 callbackUrl: '/profiles'
             })
+            router.push('/profiles')
         }
         catch(e) {
             console.error(e)
